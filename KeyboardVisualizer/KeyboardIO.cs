@@ -135,7 +135,7 @@ namespace KeyboardVisualizer
             if (currentState == null) return;
             var fftstate = (double[])currentState.FftData.Clone();
             //for (int i = 0; i < fftstate.Length; i++) fftstate[i] *= volumeSlider.CurrVal;
-            int bars = 512;
+            int bars = 256;
             if (displayBars.Length != bars) displayBars = new double[bars];
             if (barStrengthMap.Length != bars) barStrengthMap = new double[bars];
 
@@ -157,7 +157,7 @@ namespace KeyboardVisualizer
                 vals[i] = Math.Pow(vals[i], .7) * 2;
             }));
             
-            vals = PartialInverseInterpolate(vals, 30, 10);
+            vals = PartialInverseInterpolate(vals, bars / 16, 10);
 
             //Console.WriteLine(bass);
 
@@ -168,7 +168,7 @@ namespace KeyboardVisualizer
                 else
                     barStrengthMap[i] = (barStrengthMap[i] * 50 + vals[i]) / 51;
             }));
-            var mapSmooth = PartialInverseInterpolate(barStrengthMap, bars / 2, 30);
+            var mapSmooth = PartialInverseInterpolate(barStrengthMap, bars / 2, 50);
             var max = vals.Max();
             if (max > fluidMax)
                 fluidMax = (fluidMax * 10 + max) / 11;
