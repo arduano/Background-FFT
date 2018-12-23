@@ -159,10 +159,6 @@ namespace KeyboardVisualizer
             
             vals = PartialInverseInterpolate(vals, 30, 10);
 
-            var barVolume = (vals.Sum() / bars * 15 + currentState.Volume / 2);
-            double bass = Math.Max(0, barVolume - 1);
-
-            Hue += bass;
             //Console.WriteLine(bass);
 
             Parallel.For(0, bars, new Action<int>(i =>
@@ -182,6 +178,16 @@ namespace KeyboardVisualizer
             {
                 vals[i] = (vals[i] / mapSmooth[i] + vals[i]) / 2;
             }));
+
+            var barVolume = (mapSmooth.Sum() / bars * 15 + currentState.Volume / 2);
+            double bass = Math.Max(0, barVolume - 1);
+            {
+                int b = (int)(bass * 20);
+                string s = "";
+                for (int i = 0; i < b; i++) s += '#';
+                Console.WriteLine(s);
+            }
+            Hue += bass;
 
             var reds = new double[bars];
             var greens = new double[bars];
