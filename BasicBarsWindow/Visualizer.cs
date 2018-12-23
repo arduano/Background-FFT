@@ -73,10 +73,13 @@ namespace BasicBarsWindow
             if (displayWindow != null)
             {
                 displayWindow.currentState = currentState;
-                displayWindow.Update();
-                latencyMax -= 0.1;
-                if (e.BufferMilliseconds > latencyMax) latencyMax = e.BufferMilliseconds;
-                    if (currentState.BufferLength == 0) displayWindow.Title = (int)latencyMax + "ms*";
+                displayWindow.Update(true);
+
+                //latencyMax -= 0.1;
+                //if (e.BufferMilliseconds > latencyMax) latencyMax = e.BufferMilliseconds;
+                latencyMax = e.BufferMilliseconds;
+
+                if (currentState.BufferLength == 0) displayWindow.Title = (int)latencyMax + "ms*";
                     else displayWindow.Title = (int)latencyMax + "ms";
             }
         }
