@@ -1,9 +1,4 @@
 ﻿using Background_FFT.Base;
-using CUE.NET;
-using CUE.NET.Brushes;
-using CUE.NET.Devices;
-using CUE.NET.Devices.Generic;
-using CUE.NET.Devices.Generic.Enums;
 using RGB.NET.Devices.Corsair;
 using RGB.NET.Core;
 using System;
@@ -18,7 +13,6 @@ using RGB.NET.Devices.Novation;
 using RGB.NET.Devices.Razer;
 using RGB.NET.Devices.Logitech;
 using RGB.NET.Devices.Asus;
-using CUE.NET.Groups;
 
 namespace KeyboardVisualizer
 {
@@ -54,9 +48,6 @@ namespace KeyboardVisualizer
             Console.WriteLine("Initializing SDK");
             RGBSurface surface = RGBSurface.Instance;
 
-            //UpdateTrigger.UpdateFrequency = 1.0 / MathHelper.Clamp(Settings.UpdateRate, 1, 60);
-            //surface.RegisterUpdateTrigger(UpdateTrigger);
-
             LoadDevices(surface, CorsairDeviceProvider.Instance);
             LoadDevices(surface, CoolerMasterDeviceProvider.Instance);
             LoadDevices(surface, NovationDeviceProvider.Instance);
@@ -66,11 +57,11 @@ namespace KeyboardVisualizer
 
             surface.AlignDevices();
 
-            devices = surface.Devices.ToArray();//surface.GetDevices(RGBDeviceType.All).ToArray();
+            devices = surface.Devices.ToArray();
             
             foreach (var kb in devices)
             {
-                //kb.Brush = (SolidColorBrush)Color.Transparent;
+                Console.WriteLine("Detected: " + kb.DeviceInfo.Model);
             }
         }
 

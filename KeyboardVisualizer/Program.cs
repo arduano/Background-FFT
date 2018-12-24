@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CUE.NET;
-using CUE.NET.Devices.Generic.Enums;
-using CUE.NET.Devices.Generic;
-using CUE.NET.Devices;
-using CUE.NET.Brushes;
 using System.Drawing;
 using System.Threading;
 using Background_FFT.Base;
@@ -37,9 +32,6 @@ namespace KeyboardVisualizer
             }
             catch(Exception e)
             {
-                //Console.WriteLine(e.Message);
-                //Console.WriteLine(e.Source);
-                //Console.WriteLine(e.StackTrace);
                 Console.WriteLine(e.ToString());
                 Console.ReadLine();
             }

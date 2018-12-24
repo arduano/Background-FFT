@@ -58,9 +58,7 @@ namespace KeyboardVisualizer
             }
             catch (Exception _e)
             {
-                Console.WriteLine(_e.Message);
-                Console.WriteLine(_e.Source);
-                Console.WriteLine(_e.StackTrace);
+                Console.WriteLine(_e.ToString());
                 Console.ReadLine();
             }
         }
