@@ -35,20 +35,20 @@ namespace BasicBarsWindow
                 fullscreen = value;
                 if (fullscreen)
                 {
-                    DisplayDevice disp = null;
-                    foreach (var d in DisplayDevice.AvailableDisplays)
-                    {
-                        if (d.Bounds.Contains(Mouse.X, Mouse.Y))
-                        {
-                            disp = d;
-                            break;
-                        }
-                    }
-                    if (disp == null)
-                    {
-                        fullscreen = false;
-                        return;
-                    }
+                    //DisplayDevice disp = null;
+                    //foreach (var d in DisplayDevice.AvailableDisplays)
+                    //{
+                    //    if (d.Bounds.Contains(Mouse.X, Mouse.Y))
+                    //    {
+                    //        disp = d;
+                    //        break;
+                    //    }
+                    //}
+                    //if (disp == null)
+                    //{
+                    //    fullscreen = false;
+                    //    return;
+                    //}
                     WindowBorder = WindowBorder.Hidden;
                     WindowState = WindowState.Fullscreen;
                 }

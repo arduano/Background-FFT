@@ -27,17 +27,9 @@ namespace KeyboardVisualizer
                 if (enabled)
                 {
                     keyboardIO = new KeyboardIO();
-                    //Thread t = new Thread(new ThreadStart(() =>
-                    //{
-                    //    displayWindow = new DisplayWindow(1280, 720, settings);
-                    //    displayWindow.Closed += new EventHandler<EventArgs>(Close);
-                    //    displayWindow.Run(60, 60);
-                    //}));
-                    //t.Start();
                 }
                 else
                 {
-                    //displayWindow.Close();
                 }
             }
         }
@@ -54,21 +46,22 @@ namespace KeyboardVisualizer
 
         public void TransferFftData(NextFftEventArgs e)
         {
-            currentState = e;
-            if (keyboardIO != null)
+            try
             {
-                keyboardIO.currentState = currentState;
-                //Task update = new Task(new Action(() =>
-                //{
-                //    //displayWindow.Update();
-                //    //displayWindow.Render();
-                //}));
-                //update.Start();
-                latencyMax -= 0.1;
-                keyboardIO.Update();
-                //if (e.BufferMilliseconds > latencyMax) latencyMax = e.BufferMilliseconds;
-                //if (currentState.BufferLength == 0) keyboardIO.Title = (int)latencyMax + "ms*";
-                //else keyboardIO.Title = (int)latencyMax + "ms";
+                currentState = e;
+                if (keyboardIO != null)
+                {
+                    keyboardIO.currentState = currentState;
+                    latencyMax -= 0.1;
+                    keyboardIO.Update();
+                }
+            }
+            catch (Exception _e)
+            {
+                Console.WriteLine(_e.Message);
+                Console.WriteLine(_e.Source);
+                Console.WriteLine(_e.StackTrace);
+                Console.ReadLine();
             }
         }
     }

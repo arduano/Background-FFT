@@ -4,6 +4,8 @@ using CUE.NET.Brushes;
 using CUE.NET.Devices;
 using CUE.NET.Devices.Generic;
 using CUE.NET.Devices.Generic.Enums;
+using RGB.NET.Devices.Corsair;
+using RGB.NET.Core;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,6 +13,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using RGB.NET.Devices.CoolerMaster;
+using RGB.NET.Devices.Novation;
+using RGB.NET.Devices.Razer;
+using RGB.NET.Devices.Logitech;
+using RGB.NET.Devices.Asus;
+using CUE.NET.Groups;
 
 namespace KeyboardVisualizer
 {
@@ -18,7 +26,7 @@ namespace KeyboardVisualizer
     {
         public NextFftEventArgs currentState;
 
-        ICueDevice[] devices;
+        IRGBDevice[] devices;
 
         double[] displayBars = new double[0];
         double fluidMax = 0;
@@ -27,16 +35,42 @@ namespace KeyboardVisualizer
 
         double Hue = 0;
 
+        private void LoadDevices(RGBSurface surface, IRGBDeviceProvider deviceProvider)
+        {
+            surface.LoadDevices(deviceProvider, RGBDeviceType.Keyboard | RGBDeviceType.LedMatrix
+                                              | RGBDeviceType.Mousepad | RGBDeviceType.LedStripe
+                                              | RGBDeviceType.Mouse// | RGBDeviceType.Headset
+                                              | RGBDeviceType.HeadsetStand
+                                              //| RGBDeviceType.GraphicsCard
+                                              //| RGBDeviceType.DRAM | RGBDeviceType.LedMatrix
+                                              //| RGBDeviceType.LedStripe | RGBDeviceType.Keypad
+                                              //| RGBDeviceType.Mainboard
+                                              );
+        }
+
+
         public KeyboardIO()
         {
-            CueSDK.Initialize();
-            devices = CueSDK.InitializedDevices.Where(a => a.DeviceInfo.Type == CorsairDeviceType.Keyboard).ToArray();
-            CueSDK.UpdateMode = UpdateMode.Manual;
-            double offset = 4;
-            double offset2 = 0;
+            Console.WriteLine("Initializing SDK");
+            RGBSurface surface = RGBSurface.Instance;
+
+            //UpdateTrigger.UpdateFrequency = 1.0 / MathHelper.Clamp(Settings.UpdateRate, 1, 60);
+            //surface.RegisterUpdateTrigger(UpdateTrigger);
+
+            LoadDevices(surface, CorsairDeviceProvider.Instance);
+            LoadDevices(surface, CoolerMasterDeviceProvider.Instance);
+            LoadDevices(surface, NovationDeviceProvider.Instance);
+            LoadDevices(surface, RazerDeviceProvider.Instance);
+            LoadDevices(surface, LogitechDeviceProvider.Instance);
+            LoadDevices(surface, AsusDeviceProvider.Instance);
+
+            surface.AlignDevices();
+
+            devices = surface.Devices.ToArray();//surface.GetDevices(RGBDeviceType.All).ToArray();
+            
             foreach (var kb in devices)
             {
-                kb.Brush = (SolidColorBrush)Color.Transparent;
+                //kb.Brush = (SolidColorBrush)Color.Transparent;
             }
         }
 
@@ -75,17 +109,17 @@ namespace KeyboardVisualizer
             return z;
         }
 
-        static void setBrightness(ICueDevice kb, double[] heights, double[] reds, double[] greens, double[] blues)
+        static void setBrightness(IRGBDevice kb, double[] heights, double[] reds, double[] greens, double[] blues)
         {
-            float minx = kb.Leds.Select(l => l.LedRectangle.X).Min();
-            float miny = kb.Leds.Select(l => l.LedRectangle.Y).Min();
-            float maxx = kb.Leds.Select(l => l.LedRectangle.X + l.LedRectangle.Width).Max();
-            float maxy = kb.Leds.Select(l => l.LedRectangle.Y + l.LedRectangle.Height).Max();
-            float kwidth = maxx - minx;
-            float kheight = maxy - miny;
+            double minx = kb.Select(l => l.LedRectangle.X).Min();
+            double miny = kb.Select(l => l.LedRectangle.Y).Min();
+            double maxx = kb.Select(l => l.LedRectangle.X + l.LedRectangle.Width).Max();
+            double maxy = kb.Select(l => l.LedRectangle.Y + l.LedRectangle.Height).Max();
+            double kwidth = maxx - minx;
+            double kheight = maxy - miny;
             var width = heights.Length + 1;
             var height = 1;
-            foreach (var key in kb.Leds)
+            foreach (var key in kb)
             {
                 double x0 = (key.LedRectangle.X - minx) / kwidth * width;
                 double y0 = height - (key.LedRectangle.Y - miny) / kheight * height;
@@ -125,7 +159,7 @@ namespace KeyboardVisualizer
                 red /= max;
                 green /= max;
                 blue /= max;
-                key.Color = new CorsairColor((byte)(255 * red) , (byte)(255 * green), (byte)(255 * blue));
+                key.Color = new RGB.NET.Core.Color((byte)(255 * red), (byte)(255 * green), (byte)(255 * blue));
             }
             kb.Update();
         }
@@ -167,8 +201,13 @@ namespace KeyboardVisualizer
                     barStrengthMap[i] = vals[i];
                 else
                     barStrengthMap[i] = (barStrengthMap[i] * 50 + vals[i]) / 51;
+                if (vals[i] > barStrengthMap[i])
+                    displayBars[i] = vals[i];
+                else
+                    displayBars[i] = (displayBars[i] * 2 + vals[i]) / 3;
             }));
-            var mapSmooth = PartialInverseInterpolate(barStrengthMap, bars / 2, 50);
+                displayBars = PartialInverseInterpolate(displayBars, bars / 10, 3);
+            var mapSmooth = PartialInverseInterpolate(barStrengthMap, bars / 2, 100);
             var max = vals.Max();
             if (max > fluidMax)
                 fluidMax = (fluidMax * 10 + max) / 11;
@@ -176,7 +215,7 @@ namespace KeyboardVisualizer
                 fluidMax = (fluidMax * 50 + max) / 51;
             Parallel.For(0, bars, new Action<int>(i =>
             {
-                vals[i] = (vals[i] / mapSmooth[i] + vals[i]) / 2;
+                vals[i] = (displayBars[i] / mapSmooth[i] + displayBars[i] / fluidMax) / 2;//(vals[i] / mapSmooth[i] + vals[i]) / 2;
             }));
 
             var barVolume = (mapSmooth.Sum() / bars * 15 + currentState.Volume / 2);

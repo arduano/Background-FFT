@@ -22,13 +22,27 @@ namespace KeyboardVisualizer
 
         static void Main(string[] args)
         {
-            var stdIn = Console.OpenStandardInput((int)Math.Pow(2, 20));
+            try
+            {
+                Console.WriteLine("Opened");
 
-            visualizer = new Visualizer();
-            visualizer.Enabled = true;
+                visualizer = new Visualizer();
+                visualizer.Enabled = true;
 
-            bg_worker.NextFftEvent += NextFft;
-            bg_worker.Start();
+                Console.WriteLine("Visualizer Created");
+
+                bg_worker.NextFftEvent += NextFft;
+                Console.WriteLine("Starting Background Worker");
+                bg_worker.Start();
+            }
+            catch(Exception e)
+            {
+                //Console.WriteLine(e.Message);
+                //Console.WriteLine(e.Source);
+                //Console.WriteLine(e.StackTrace);
+                Console.WriteLine(e.ToString());
+                Console.ReadLine();
+            }
         }
 
         static void NextFft(object sender, NextFftEventArgs e)
