@@ -73,7 +73,7 @@ namespace BasicBarsWindow
             if (displayWindow != null)
             {
                 displayWindow.currentState = currentState;
-                displayWindow.Update(true);
+                displayWindow.Update();
 
                 //latencyMax -= 0.1;
                 //if (e.BufferMilliseconds > latencyMax) latencyMax = e.BufferMilliseconds;

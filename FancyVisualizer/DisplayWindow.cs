@@ -446,15 +446,17 @@ namespace FancyVisualizer
 
             double mx;
             double my;
+            var cursor = Mouse.GetCursorState();
+            var cursorPos = this.PointToClient(new Point(cursor.X, cursor.Y));
             if (this.Width > this.Height)
             {
-                mx = (Mouse.X - (double)this.Width / 2) / this.Height;
-                my = (Mouse.Y - (double)this.Height / 2) / this.Height;
+                mx = (cursorPos.X - (double)this.Width / 2) / this.Height;
+                my = (cursorPos.Y - (double)this.Height / 2) / this.Height;
             }
             else
             {
-                mx = (Mouse.X - (double)this.Width / 2) / this.Width;
-                my = (Mouse.Y - (double)this.Height / 2) / this.Width;
+                mx = (cursorPos.X - (double)this.Width / 2) / this.Width;
+                my = (cursorPos.Y - (double)this.Height / 2) / this.Width;
             }
 
             if (bassSlider.dragging)
@@ -531,7 +533,7 @@ namespace FancyVisualizer
             GL.EnableClientState(ArrayCap.ColorArray);
 
             GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.LoadIdentity();
