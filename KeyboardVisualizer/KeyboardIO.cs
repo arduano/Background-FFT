@@ -217,15 +217,16 @@ namespace KeyboardVisualizer
                 for (int i = 0; i < b; i++) s += '#';
                 Console.WriteLine(s);
             }
-            Hue += bass;
+            Hue += bass / 3;
 
             var reds = new double[bars];
             var greens = new double[bars];
             var blues = new double[bars];
+            var avg = mapSmooth.Average();
             Parallel.For(0, bars, new Action<int>(i =>
             {
                 //HlsToRgb(i * 360.0 / bars, 0.5, 1, out reds[i], out greens[i], out blues[i]);
-                var hue = mapSmooth[i] * 700 + Hue;
+                var hue = Math.Pow(mapSmooth[i] / avg, 3) * 50 + Hue;
                 HlsToRgb(hue % 360, 0.5, 1, out reds[i], out greens[i], out blues[i]);
             }));
 
